@@ -5,7 +5,8 @@ from pathlib import Path
 
 def convert_to_ttax(ct_csv_path:Path) -> None:
     # Load in the CSV
-    df = pd.read_csv(ct_csv_path, parse_dates=['Date Sold', 'Purchase Date'])
+    dateparse = lambda x: pd.datetime.strptime(x, '%d.%m.%Y')
+    df = pd.read_csv(ct_csv_path, parse_dates=['Date Sold', 'Purchase Date'], date_parser=dateparse)
 
     # Create the new columns
     asset_name = df['Amount'].apply(str) + ' ' + df['Currency Name']

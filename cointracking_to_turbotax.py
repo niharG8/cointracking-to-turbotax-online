@@ -6,16 +6,16 @@ from pathlib import Path
 def convert_to_ttax(ct_csv_path:Path) -> None:
     # Load in the CSV
     dateparse = lambda x: pd.datetime.strptime(x, '%d.%m.%Y')
-    df = pd.read_csv(ct_csv_path, parse_dates=['Date Sold', 'Purchase Date'], date_parser=dateparse)
+    df = pd.read_csv(ct_csv_path, parse_dates=['Date Sold', 'Date Acquired'], date_parser=dateparse)
 
     # Create the new columns
-    asset_name = df['Amount'].apply(str) + ' ' + df['Currency Name']
+    asset_name = df['Amount'].apply(str) + ' ' + df['Currency']
     DATE_FMT = '%m/%d/%Y'
-    received_date = df['Purchase Date'].dt.strftime(DATE_FMT)
+    received_date = df['Date Acquired'].dt.strftime(DATE_FMT)
     date_sold = df['Date Sold'].dt.strftime(DATE_FMT)
     strip_commas = lambda x: x.replace(',', '')
-    cost_basis_usd = pd.to_numeric(df['Cost Basis'].apply(strip_commas))
-    proceeds = pd.to_numeric(df['Proceeds'].apply(strip_commas))
+    cost_basis_usd = pd.to_numeric(df['Cost Basis in USD'].apply(strip_commas))
+    proceeds = pd.to_numeric(df['Proceeds in USD'].apply(strip_commas))
 
     # Assemble the output dataframe
     df_out = pd.DataFrame({'Asset name': asset_name, 'Received Date': received_date, 'Cost Basis (USD)': cost_basis_usd,
